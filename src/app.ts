@@ -1,14 +1,22 @@
 import express, { type Application } from "express"; 
+import { authRouter } from "./modules/auth/auth.route";
 
 const app: Application = express();
+
 app.use(express.json())
+app.use(express.text()); 
+app.use(express.urlencoded({ extended: true }));
  
+app.use("/api/auth", authRouter)
+
+
+
 
 app.get("/", (req, res) => {
     try {
         res.status(200).json({
         success: true,
-        message: "Follow API endpoints",
+        message: "Express Server",
         api_endpoint: {
             user_registration: "/api/auth/signup",
             user_login: "/api/auth/login",
@@ -27,7 +35,5 @@ app.get("/", (req, res) => {
         })
     }
 } )
-
-
 
 export default app;
