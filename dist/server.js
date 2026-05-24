@@ -453,6 +453,7 @@ var jwtVerify_default = jwtVerify;
 // src/middleware/updateIssue.middleware.ts
 var updateIssue2 = async (req, res, next) => {
   try {
+    console.log("first");
     const { id } = req.params;
     const token = req.headers.authorization;
     const issue = await issuesService.getSingleIssueFromDB(id);
@@ -488,17 +489,27 @@ var guard = async (req, res, next) => {
   try {
     const token = req.headers.authorization;
     if (!token) {
-      throw new Error("token undefined");
+      return res.status(401).json({
+        success: false,
+        message: "Token missing"
+      });
     }
     const decoded = jwtVerify_default(token, config_default.jwt_secret);
     if (!decoded) {
-      throw new Error("unauthorized");
+      return res.status(401).json({
+        success: false,
+        message: "Invalid token"
+      });
     }
-    if (decoded.role === USER_ROLE.maintainer) {
-      return next();
+    if (decoded.role !== USER_ROLE.maintainer) {
+      return res.status(403).json({
+        success: false,
+        message: "Only maintainer can delete issue"
+      });
     }
-  } catch (error) {
-    next(error);
+    next();
+  } catch (err) {
+    next(err);
   }
 };
 var gurad_middleware_default = guard;
