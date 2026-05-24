@@ -3,6 +3,7 @@ import { issuesService } from "../modules/issues/issues.service";
 import jwt, { type JwtPayload } from "jsonwebtoken";
 import { USER_ROLE } from "../types";
 import config from "../config";
+import jwtVerify from "../utility/jwtVerify";
 
 const updateIssue = async (req: Request, res: Response, next: NextFunction) => {
 try {
@@ -18,7 +19,7 @@ try {
         throw new Error("token undefined")
     }
 
-    const decoded = jwt.verify( token as string, config.jwt_secret as string ) as JwtPayload;
+    const decoded = jwtVerify(token as string, config.jwt_secret as string)
 
     if(!decoded) {
         throw new Error("unauthorized")

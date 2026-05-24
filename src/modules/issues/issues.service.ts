@@ -1,4 +1,3 @@
-
 import { pool } from "../../db"
 import { ISSUE_SORT, ISSUE_STATUS, ISSUE_TYPE, type TFilter, type TPayload } from "../../types";
 import type { IIssue } from "./issues.interface"  
@@ -13,8 +12,6 @@ const createIssuesIntoDB = async (payload: IIssue, ) => {
     
     return issue;
 }
-
-
 
 const getAllIssuesFromDB = async (filter: TFilter) => {
     const { sort, type, status } = filter;
