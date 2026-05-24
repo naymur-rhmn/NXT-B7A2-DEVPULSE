@@ -1,5 +1,6 @@
 
 import { pool } from "../../db"
+import { ISSUE_SORT, ISSUE_STATUS, ISSUE_TYPE } from "../../types";
 import type { IIssue } from "./issues.interface"  
 
 const createIssuesIntoDB = async (payload: IIssue, ) => {
@@ -13,6 +14,76 @@ const createIssuesIntoDB = async (payload: IIssue, ) => {
     return issue;
 }
 
+
+
+const getAllIssuesFromDB = async (filter: any) => {
+    const { sort, type, status } = filter;
+    let queryString = `SELECT * FROM issues`
+ 
+    const condition = []
+    const values = []
+
+    if(type === ISSUE_TYPE.bug || type === ISSUE_TYPE.feature_request) {
+        condition.push(`type = $${values.length + 1}`);
+        values.push(type)
+    }
+
+    if(status && status === ISSUE_STATUS.open || status === ISSUE_STATUS.in_progress || status === ISSUE_STATUS.resolved) {
+        condition.push(`type = $${values.length + 1}`);
+        values.push(status);
+    }
+
+    if(condition.length > 0) {
+        queryString = queryString + ` WHERE ` + condition.join(" AND ");
+    }
+
+
+    if(sort === ISSUE_SORT.newest) {
+        queryString += ` ORDER BY created_at ASC`
+    } else if (sort === ISSUE_SORT.oldest) {
+        queryString += ` ORDER BY created_at DESC`
+    }
+
+
+    const issueResult = await pool.query(queryString, values)
+    const issues = issueResult.rows;
+ 
+ 
+    const reporterIds = [...new Set(issues.map(i => i.reporter_id))];
+ 
+    const usersResult = await pool.query(
+    `
+    SELECT id, name, role
+    FROM users
+    WHERE id = ANY($1)
+    `,
+    [reporterIds]
+    );
+
+    const users = usersResult.rows; 
+
+    const userMap = new Map(users.map(user => [user.id, user]));
+    
+    const result = issues.map(issue => {
+        return {
+            id: issue.id,
+            title: issue.title,
+            description: issue.description,
+            type: issue.type,
+            status: issue.status,
+            reporter: userMap.get(issue.reporter_id) || null,
+            created_at: issue.created_at,
+            updated_at: issue.updated_at
+        }
+    })
+
+    return result;
+}
+
+
+
+
 export const issuesService = {
     createIssuesIntoDB,
+    getAllIssuesFromDB
 }
