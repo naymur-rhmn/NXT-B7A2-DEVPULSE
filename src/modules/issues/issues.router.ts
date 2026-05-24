@@ -2,7 +2,7 @@ import { Router } from "express";
 import { issuesController } from "./issues.controller";
 import auth from "../../middleware/auth.middleware";
 import { USER_ROLE } from "../../types";
-import updateIssue from "../../middleware/updateIssue.middleware";
+import updateIssue from "../../middleware/updateIssue.middleware"; 
 import guard from "../../middleware/gurad.middleware";
 
 const router = Router();
