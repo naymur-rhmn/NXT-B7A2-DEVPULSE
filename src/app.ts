@@ -1,5 +1,7 @@
 import express, { type Application } from "express"; 
 import { authRouter } from "./modules/auth/auth.route";
+import { issuesRouter } from "./modules/issues/issues.router";
+import globalErrorHandler from "./middleware/globalErrorHandler";
 
 const app: Application = express();
 
@@ -8,9 +10,10 @@ app.use(express.text());
 app.use(express.urlencoded({ extended: true }));
  
 app.use("/api/auth", authRouter)
+app.use("/api/issues", issuesRouter)
 
 
-
+app.use(globalErrorHandler);
 
 app.get("/", (req, res) => {
     try {
