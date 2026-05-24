@@ -20,6 +20,10 @@ export const ISSUE_SORT = {
 }  as const;
 
 
-// export type Types = ;
+export type TFilter = {
+  sort?: string,
+  type?: string,
+  status?: string
+}
 
 export type ROLES = "contributor" | "maintainer" ;

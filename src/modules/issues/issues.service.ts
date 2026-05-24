@@ -1,6 +1,6 @@
 
 import { pool } from "../../db"
-import { ISSUE_SORT, ISSUE_STATUS, ISSUE_TYPE } from "../../types";
+import { ISSUE_SORT, ISSUE_STATUS, ISSUE_TYPE, type TFilter } from "../../types";
 import type { IIssue } from "./issues.interface"  
 
 const createIssuesIntoDB = async (payload: IIssue, ) => {
@@ -16,7 +16,7 @@ const createIssuesIntoDB = async (payload: IIssue, ) => {
 
 
 
-const getAllIssuesFromDB = async (filter: any) => {
+const getAllIssuesFromDB = async (filter: TFilter) => {
     const { sort, type, status } = filter;
     let queryString = `SELECT * FROM issues`
  
@@ -80,10 +80,44 @@ const getAllIssuesFromDB = async (filter: any) => {
     return result;
 }
 
+const getSingleIssueFromDB = async (id: string) => {
+    const res = await pool.query(`
+            SELECT * FROM issues WHERE id=$1
+        `, [id])
+    
+    const issue = res.rows[0];
 
+    
+    const reporterId = issue.reporter_id;
+ 
+    const userResult = await pool.query(
+    `
+    SELECT id, name, role
+    FROM users
+    WHERE id=$1
+    `,
+    [reporterId]
+    );
+
+    const users = userResult.rows[0]; 
+
+    const result =  {
+        id: issue.id,
+        title: issue.title,
+        description: issue.description,
+        type: issue.type,
+        status: issue.status,
+        reporter: {...users},
+        created_at: issue.created_at,
+        updated_at: issue.updated_at
+    } 
+    
+    return result;
+}
 
 
 export const issuesService = {
     createIssuesIntoDB,
-    getAllIssuesFromDB
+    getAllIssuesFromDB,
+    getSingleIssueFromDB
 }
