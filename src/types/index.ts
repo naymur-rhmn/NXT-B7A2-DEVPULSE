@@ -27,3 +27,7 @@ export type TFilter = {
 }
 
 export type ROLES = "contributor" | "maintainer" ;
+
+export type TPayload = {
+    title?: string, description?: string, type?: string, status?: string
+}

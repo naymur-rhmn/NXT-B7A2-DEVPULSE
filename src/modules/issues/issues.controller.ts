@@ -61,7 +61,7 @@ const getSingleIssue =  async  (req: Request, res: Response) => {
         })
     } catch (error: any) {
         sendResponse(res, {
-            statusCode: 400,
+            statusCode: 404,
             success: false,
             message: error.message,
             error: error.message
@@ -70,8 +70,50 @@ const getSingleIssue =  async  (req: Request, res: Response) => {
 
 }
 
+const updateIssue = async  (req: Request, res: Response) => {
+    try { 
+        const result = await issuesService.updateIssueIntoDB(req.body, req.params.id as string)
+
+         sendResponse(res, {
+            statusCode: 200,
+            success: true,
+            message: "Update Successfull",
+            data: result.rows[0]
+        })
+        
+    } catch (error:any) {
+        sendResponse(res, {
+            statusCode: 404,
+            success: false,
+            message: error.message,
+            error: error.message
+        })
+    }
+}
+
+const deleteIssue = async  (req: Request, res: Response) => {
+    try {
+        const result = await issuesService.deleteIssueFromDB(req.params.id as string);
+
+        sendResponse(res, {
+            statusCode: 200,
+            success: true,
+            message:"Issue deleted successfully"
+        })
+    } catch (error: any) {
+        sendResponse(res, {
+            statusCode: 500,
+            success: false,
+            message: error.message,
+            error: error.message
+        })
+    }
+}
+
 export const issuesController = {
     createIssue,
     getAllIssues,
-    getSingleIssue
+    getSingleIssue,
+    updateIssue,
+    deleteIssue
 }
