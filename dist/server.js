@@ -5,6 +5,7 @@
 
 // src/app.ts
 import express from "express";
+import cors from "cors";
 
 // src/modules/auth/auth.route.ts
 import { Router } from "express";
@@ -19,7 +20,8 @@ dotenv.config({ path: path.join(process.cwd(), ".env") });
 var config = {
   port: process.env.PORT,
   connection_url: process.env.CONNECTION_STRING,
-  jwt_secret: process.env.JWT_SECRET
+  jwt_secret: process.env.JWT_SECRET,
+  client_url: process.env.CLIENT_URL
 };
 var config_default = config;
 
@@ -542,6 +544,11 @@ var app = express();
 app.use(express.json());
 app.use(express.text());
 app.use(express.urlencoded({ extended: true }));
+app.use(
+  cors({
+    origin: config_default.client_url
+  })
+);
 app.use("/api/auth", authRouter);
 app.use("/api/issues", issuesRouter);
 app.get("/", (req, res) => {
